@@ -1,0 +1,221 @@
+﻿<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CURD Test</title>
+
+    <link rel="Stylesheet" src="https://code.jquery.com/jquery-1.12.3.js"/> 
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.js"></script>
+
+
+    <style>
+        table {
+            margin: 0 auto;
+            font-size: small;
+            border: 1px solid black;
+        }
+
+        h1 {
+            text-align: center;
+            color: #006600;
+            font-size: xx-large;
+            font-family: 'Verdana';
+        }
+
+        td {
+            background-color: #E4F5D4;
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            font-weight: bold;
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        td {
+            font-weight: lighter;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <h1>USER ID TEST</h1>
+
+
+        <form onsubmit="return setAction(this)">
+
+            <div id="view" style="visibility:hidden">
+                <label for="id">id:</label><br>
+                <input type="text" id="id" name="id" value="1001"><br>
+
+
+                <label for="userid">User id:</label><br>
+                <input type="text" id="userid" name="userid" value="testuser"><br>
+
+                <label for="uname">user name:</label><br>
+                <input type="text" id="uname" name="uname" value="testusername"><br>
+                <label for="email">Email-id:</label><br>
+                <input type="text" id="email" name="email" value="test@email.com"><br><br>
+
+            </div>
+
+            <input type="submit" value="Submit">
+
+            <input id="Add" type="button" value="Add+"  onclick='View()'>
+
+            <input id="EDIT" type="button" value="EDIT" style="visibility:hidden">
+        </form>
+
+         
+
+
+
+        <table id='table' width="850px" class="display">
+            <tr>
+                <th>Check</th>
+                <th>Userid</th>
+                <th>Username</th>
+                <th>Email</th>
+
+            </tr>
+
+            <script>
+
+
+                function setAction(form) {
+                    //form.action = "index.html";
+                  // alert(document.getElementById("demo").innerHTML);
+                    //return false;
+
+                    validate();
+
+                }
+
+                
+
+                function validate() {
+                    //alert("sateesh");
+                    var _id = document.getElementById("id").value;
+                    var _userId = document.getElementById("userid").value;
+                    var _title = document.getElementById("uname").value;
+                    var _completed = document.getElementById("email").value;
+                    $.ajax({
+                        type: "POST",
+                        url: "https://jsonplaceholder.typicode.com/posts/",
+                        contentType: "application/json",
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            id: _id,
+                            userId: _userId,
+                            title: _title,
+                            completed:_completed
+                        }),
+                        success: function (response) {
+                            var names = response.d;
+                            alert(d + 'success');
+                        } 
+                        ,failure: function (response) {
+                            alert(response.d);
+
+                        }
+                    });
+                    //console.log(ra, rag)
+
+                }
+
+
+                
+                $(document).ready(function () {
+
+                    $.getJSON("https://jsonplaceholder.typicode.com/posts",
+                        function (data) {
+                            var _test = '';
+
+                            $.each(data, function (key, value) {
+
+                                _test += '<tr>';
+                                _test += '<td> <input type="checkbox" id="myCheck' + value.id + '" onclick="myFunction(' + value.id + ')">' +
+                                    '</td>';
+
+                                _test += '<td>' +
+                                    value.userId + '</td>';
+
+                                _test += '<td>' +
+                                    value.title + '</td>';
+
+                                _test += '<td>' +
+                                    value.body + '</td>';
+
+                                _test += '</tr>';
+                            });
+
+                            $('#table').append(_test);
+                        });
+                });
+
+
+                function myFunction(chk) {
+
+                    var checkBox = document.getElementById("myCheck" + chk);
+
+                    if (checkBox.checked == true) {
+                         
+                        document.getElementById("EDIT").style.visibility = "visible";
+                    } else {
+                         
+                        document.getElementById("EDIT").style.visibility = "hidden";
+                    }
+                }
+
+                function View() {
+
+                    var vtest = document.getElementById("view");
+
+                    if (vtest.value == 'Add+') {
+
+                        document.getElementById("view").style.visibility = "visible";
+                        vtest.value = 'Add-';
+                    } else {
+
+                        document.getElementById("view").style.visibility = "hidden";
+                        vtest.value = 'Add+';
+                    }
+                }
+                 
+
+                $(document).ready(function () {
+                    $('#table').DataTable({
+                        initComplete: function () {
+                            this.api().columns().every(function () {
+                                var column = this;
+                                var select = $('<select><option value=""></option></select>')
+                                    .appendTo($(column.footer()).empty())
+                                    .on('change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                            $(this).val()
+                                        );
+                                        //to select and search from grid  
+                                        column
+                                            .search(val ? '^' + val + '$' : '', true, false)
+                                            .draw();
+                                    });
+
+                                column.data().unique().sort().each(function (d, j) {
+                                    select.append('<option value="' + d + '">' + d + '</option>')
+                                });
+                            });
+                        }
+                    });
+                });
+
+
+            </script>
+    </section>
+</body>
+
+</html> 
